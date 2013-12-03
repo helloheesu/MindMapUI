@@ -58,7 +58,7 @@ console.log(Contents);
 
 ////////////////// Positioning Nodes to HTML //////////////////
 
-function ChangeMain(NodeObj, Name) {
+function ChangeMain(NodeObj, Name, ChildNameArray) {
 	if (!Name) { console.log("ChangeMain : No Name Input"); return; }
 	if (typeof NodeObj[Name] === "undefined") { console.log("ChangeMain : Name undefined"); return; }
 
@@ -66,23 +66,23 @@ function ChangeMain(NodeObj, Name) {
 	var MainElement = GetNewNodeElement(NodeObj, Name, 'Main', ColorList);
 	document.getElementById('wrap').appendChild(MainElement);
 
-	var aChildElement = [];
-	for (var i = 0; i < NodeObj[Name].Child.length; i++) {
+	if (!ChildNameArray) ChildNameArray = NodeObj[Name].Child;
+
+	var ChildElementArray = [];
+	for (var i = 0; i < ChildNameArray.length; i++) {
 		console.log("Creating Child "+i);
-		aChildElement[i] = GetNewNodeElement(NodeObj, NodeObj[Name].Child[i], 'Child', ColorList);
-		document.getElementById('wrap').appendChild(aChildElement[i]);
+		ChildElementArray[i] = GetNewNodeElement(NodeObj, ChildNameArray[i], 'Child', ColorList);
+		document.getElementById('wrap').appendChild(ChildElementArray[i]);
 	}
 
+	// 부모 노드를 배열의 맨 앞에 넣는다.
 	if (NodeObj[Name].Parent) {
-		console.log(aChildElement.length);
-		aChildElement.unshift(GetNewNodeElement(NodeObj, NodeObj[Name].Parent, 'Parent', ColorList));
-		document.getElementById('wrap').appendChild(aChildElement[0]);
-		console.log(aChildElement.length);
+		ChildElementArray.unshift(GetNewNodeElement(NodeObj, NodeObj[Name].Parent, 'Parent', ColorList));
+		document.getElementById('wrap').appendChild(ChildElementArray[0]);
 	}
 
 	var LongerWidth = (document.getElementsByClassName('Main')[0].offsetWidth > document.getElementsByClassName('Main')[0].offsetHeight) ? document.getElementsByClassName('Main')[0].offsetWidth : document.getElementsByClassName('Main')[0].offsetHeight;
-	MakeCircle(aChildElement, LongerWidth*0.5);
-	
+	MakeCircle(ChildElementArray, LongerWidth*0.5);
 }
 
 function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
@@ -125,4 +125,62 @@ function MakeCircle(ElementArray, ParentRadius, MarginRadius) {
 		// ElementArray[i].style.webkitTransform = "matrix(1,0,0,1,"+Math.cos(Degree*Math.PI/180)+","+Math.sin(Degree*Math.PI/180)+")" + styleInfo.webkitTransform;
 		// ElementArray[i].style.webkitTransform = "rotate("+Degree+"deg) translate("+Radius+"px) rotate(-"+Degree+"deg)";
 	}
+}
+
+
+
+
+////////////////// Selecting Random Nodes for Initial Loading //////////////////
+
+function GetRandomNodeNameArray(NodeObj, n, ExcludeCnt) {
+	
+	var NameArray = []
+	for (name in NodeObj) {
+		NameArray.push(name);
+	}
+
+	if (!ExcludeCnt) return ShuffleArray(NameArray).splice(0, n);
+
+
+	////// Excluding Elements /////
+	var OriginArgCnt = 3;
+
+	// n, ExcludeCnt 이 너무 큰지 조사하고 로그 출력. 하지만 종료시키진 않음. 돌아가긴 한다, 결과가 원하는 바와 다를 순 있지만.
+	if (NameArray.length - ExcludeCnt < n) { console.log("GetRandomNodeNameArray : n is too large."); }
+	if (arguments.length - OriginArgCnt < ExcludeCnt) { 
+		console.log("GetRandomNodeNameArray : ExcludeCnt is too large.");
+		ExcludeCnt = arguments.length - OriginArgCnt;
+	}
+
+	NameArray = ShuffleArray(NameArray);
+
+	for (var i = 0; i < ExcludeCnt; i++) {
+		var index = NameArray.indexOf(arguments[i+OriginArgCnt]);
+		if (index >= 0) {
+			var removed = NameArray.splice(index, 1);
+			console.log("Removed "+removed);				
+		}
+	}
+
+	return NameArray.splice(0, n);
+}
+
+// referenced : http://stackoverflow.com/questions/3718282/javascript-shuffling-objects-inside-an-object-randomize/
+function ShuffleArray(sourceArray) {
+    for (var n = 0; n < sourceArray.length - 1; n++) {
+        var k = n + Math.floor(Math.random() * (sourceArray.length - n));
+
+        var temp = sourceArray[k];
+        sourceArray[k] = sourceArray[n];
+        sourceArray[n] = temp;
+    }
+    return sourceArray;
+}
+
+function Init(n, NodeObj, main) {
+	if (!NodeObj) NodeObj = Contents;
+	if (!n) {n = 7;}
+	if (!main) main = 'Node0';
+	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
+	ChangeMain( NodeObj, main, GetRandomNodeNameArray(NodeObj, n, 2, 'NodeCnt', 'Node0') );
 }
