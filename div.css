@@ -25,7 +25,7 @@
 	-webkit-transform: matrix(1,0,0,1,0,0);
 }
 
-
+/*지금은 Child, Parent 에 동일한 스타일을 부여했으나, 추후에 다르게 할 수도 있으므로.. 일단 클래스 다르 부여.*/
 .Child {
 	transform:
 	scale(0.5, 0.5);
