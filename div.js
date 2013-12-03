@@ -183,4 +183,9 @@ function Init(n, NodeObj, main) {
 	if (!main) main = 'Node0';
 	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
 	ChangeMain( NodeObj, main, GetRandomNodeNameArray(NodeObj, n, 2, 'NodeCnt', 'Node0') );
+	var ChildNodes = document.getElementsByClassName('Child');
+	for (var i = 0; i < ChildNodes.length; i++) {
+		var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
+		ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.2+")";
+	};
 }
