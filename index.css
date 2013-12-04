@@ -17,6 +17,7 @@ footer {
 	position: absolute;
 	top: 100%;
 	margin-top: -2em;
+	z-index:-1;
 }
 
 #None {
