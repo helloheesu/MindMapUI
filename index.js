@@ -4,14 +4,35 @@
 
 // Color Palette from : http://www.colourlovers.com/palette/92095/Giant_Goldfish
 ColorList = ["#F38630", "#69D2E7", "#E0E4CC", "#FA6900", "#A7DBD8"];
+// Background Pattern from : http://www.colourlovers.com/pattern/
+// Licences Checked. I'll not use these in commercial.
 
-
+BackgroundList = [];
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3822/3822133.png?1377093078");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3816/3816031.png?1376890972");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/582/582552.png?1250954754");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/328/328710.png?1332797054");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1101/1101098.png?1287436878");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/89/89366.png?1321378552");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1181/1181271.png?1291485803");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1684/1684015.png?1312140286");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2290/2290455.png?1335954364");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1631/1631873.png?1340389562");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1462/1462099.png?1352412939");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2340/2340229.png?1332799455");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2445/2445745.png?1335447079");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2639/2639257.png?1340222595");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2168/2168138.png?1328143893");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3898/3898458.png?1380324096");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3396/3396019.png?1361211310");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1776/1776807.png?1353263169");
+BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3878/3878314.png?1379402588");
 
 ////////////////// Adding Nodes to Array //////////////////
 
 ///// DB가 없으므로 전역변수 .... 헣헣 /////
 Contents = {'NodeCnt':0};
-Contents['None'] = {'Content':'', 'Depth':0, 'Parent':null, 'Child':[]}
+Contents['None'] = {'Content':'', 'Depth':0, 'Parent':null, 'Child':[]};
 Contents['Node0'] = {'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
 
 function AddChildNode(NodeObj, Parent, Content) {
@@ -172,11 +193,12 @@ function ShuffleArray(sourceArray) {
     return sourceArray;
 }
 
-function Init(n, NodeObj, main) {
+function Init(n, NodeObj, main, bgArray) {
 	if (!NodeObj) NodeObj = Contents;
 	if (!n) {n = 7;}
 	if (!main) main = 'None';
 	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
+	if (!bgArray) bgArray = BackgroundList;
 
 	var ExcludeNodeNameArray = ['NodeCnt', 'None'];
 	if (main && ExcludeNodeNameArray.indexOf(main) == -1) ExcludeNodeNameArray.push(main);
@@ -191,6 +213,9 @@ function Init(n, NodeObj, main) {
 	var ChildNodes = document.getElementsByClassName('Child');
 	for (var i = 0; i < ChildNodes.length; i++) {
 		var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
-		ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.2+")";
+		ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.3+")";
 	};
+
+	var randNum = Math.floor(Math.random() * bgArray.length);
+	document.getElementById('bg').style.backgroundImage="url("+bgArray[randNum]+")";
 }
