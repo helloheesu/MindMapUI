@@ -31,12 +31,17 @@ BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/38
 ////////////////// Adding Nodes to Array //////////////////
 
 ///// DB가 없으므로 전역변수 .... 헣헣 /////
+
+// 'NodeCnt' 는 Exclude 에서 항상 신경 써 줘야 함 ㅜㅜ
 Contents = {'NodeCnt':0};
-Contents['None'] = {'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <p>졸려</p> </object>'};
 // referenced : http://jwcross.tistory.com/31
 // chrome, safari 에서는 alt 속성이 안 먹는다 ㅜㅜ
 // Contents['None'] = {'Content':'<img alt="sleepy" src="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1"/>'};
-Contents['Node0'] = {'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
+Contents['Empty'] = {'Exclude':true, 'Content':''};
+Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <span style="font-size:2em;">졸려</span> </object>'};
+Contents['Add'] = {'Exclude':true, 'Content':'<span style="font-size:5em; color:gray;">+</span>'};
+// 'Node0' 은 어차피 항상 자식. (-> 'Exclude':true )
+Contents['Node0'] = {'Exclude':true, 'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
 
 function AddChildNode(NodeObj, Parent, Content) {
 	// 나중에 error 처리를 위해 (예외처리에 관한)if 문을 따로 둠. 일단은 console 창에서 찍는 걸로.
@@ -83,7 +88,7 @@ console.log(Contents);
 
 ////////////////// Positioning Nodes to HTML //////////////////
 
-function ChangeMain(NodeObj, MainName, ChildNameArray) {
+function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) {
 	document.getElementById('wrap').innerHTML = "";
 	if (!MainName) { console.log("ChangeMain : No MainName Input"); return; }
 	if (typeof NodeObj[MainName] === "undefined") { console.log("ChangeMain : MainName undefined"); return; }
@@ -93,6 +98,7 @@ function ChangeMain(NodeObj, MainName, ChildNameArray) {
 	document.getElementById('wrap').appendChild(MainElement);
 
 	if (!ChildNameArray) ChildNameArray = NodeObj[MainName].Child;
+	if (bShuffleChild===true) ChildNameArray = GetShuffledArray(ChildNameArray);
 
 	var ChildElementArray = [];
 	for (var i = 0; i < ChildNameArray.length; i++) {
@@ -107,6 +113,24 @@ function ChangeMain(NodeObj, MainName, ChildNameArray) {
 		document.getElementById('wrap').appendChild(ChildElementArray[0]);
 	}
 
+	// 추가 노드를 배열에 넣는다.
+	if (bAddable===true) {
+		ChildElementArray.push(GetNewNodeElement(NodeObj, 'Add', 'Parent', ColorList));
+		document.getElementById('wrap').appendChild(ChildElementArray[ChildElementArray.length-1]);
+	}
+
+	// 루트 노드는 항상 배열에 넣는다. 단, 부모가 있을 때는 순서가 맨 뒤.
+	// !!!!!! (루트 이름이 'Node0'이라는 가정이 들어 감)
+	if (NodeObj[MainName].Parent != 'Node0' && MainName!='Node0') {
+		if (NodeObj[MainName].Parent) {
+			ChildElementArray.push(GetNewNodeElement(NodeObj, 'Node0', 'Parent', ColorList));
+			document.getElementById('wrap').appendChild(ChildElementArray[ChildElementArray.length-1]);
+		} else {
+			ChildElementArray.unshift(GetNewNodeElement(NodeObj, 'Node0', 'Parent', ColorList));
+			document.getElementById('wrap').appendChild(ChildElementArray[0]);
+		}
+	}
+
 	var LongerWidth = (document.getElementsByClassName('Main')[0].offsetWidth > document.getElementsByClassName('Main')[0].offsetHeight) ? document.getElementsByClassName('Main')[0].offsetWidth : document.getElementsByClassName('Main')[0].offsetHeight;
 	MakeCircle(ChildElementArray, LongerWidth*0.5);
 }
@@ -117,7 +141,11 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	Element.className = 'Node ';
 	if (ClassType) Element.className += ClassType+' ';
 	if (NodeObj[Name].Content) Element.innerHTML = NodeObj[Name].Content;
-	if (ColorArray && (NodeObj[Name].Depth || NodeObj[Name].Depth===0)) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
+	if (NodeObj[Name].Depth || NodeObj[Name].Depth===0) {
+		if (ColorArray) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
+	} else {
+		Element.style.boxShadow = "0 0";
+	}
 	console.log(Element);
 	// appendChild 도 공통된 행위라 GetNewNodeElement 에 묶을까 했으나, 받아서 직접 넣는 게 사용자 입장에서 맞는 것 같아서 일부러 뺌. 마치 new 로 받아오면 AddChild 는 직접 해 줘야 하듯이 헣헣
 	// document.getElementById('wrap').appendChild(Element);
@@ -165,13 +193,13 @@ function GetRandomNodeNameArray(NodeObj, howMany, ExcludeArray) {
 		NameArray.push(name);
 	}
 
-	if (!ExcludeArray) return ShuffleArray(NameArray).splice(0, howMany);
+	if (!ExcludeArray) return GetShuffledArray(NameArray).splice(0, howMany);
 
 	////// Excluding Elements /////
 	// howMany 값이 너무 큰지 조사하고 로그 출력. 하지만 종료시키진 않음. 돌아가긴 한다, 기대한 것보다 적은 개수가 반환될 수 있긴 하지만.
 	if (NameArray.length - ExcludeArray.length < howMany) { console.log("GetRandomNodeNameArray : howMany is too large."); }
 
-	NameArray = ShuffleArray(NameArray);
+	NameArray = GetShuffledArray(NameArray);
 
 	for (var i = 0; i < ExcludeArray.length; i++) {
 		var index = NameArray.indexOf(ExcludeArray[i]);
@@ -185,7 +213,7 @@ function GetRandomNodeNameArray(NodeObj, howMany, ExcludeArray) {
 }
 
 // referenced : http://stackoverflow.com/questions/3718282/javascript-shuffling-objects-inside-an-object-randomize/
-function ShuffleArray(sourceArray) {
+function GetShuffledArray(sourceArray) {
     for (var n = 0; n < sourceArray.length - 1; n++) {
         var k = n + Math.floor(Math.random() * (sourceArray.length - n));
 
@@ -198,17 +226,22 @@ function ShuffleArray(sourceArray) {
 
 function Init(n, NodeObj, main, bgArray) {
 	if (!NodeObj) NodeObj = Contents;
-	if (!n) {n = 7;}
+	if (!n) {n = 6;}
 	if (!main) main = 'None';
 	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
 	if (!bgArray) bgArray = BackgroundList;
 
-	var ExcludeNodeNameArray = ['NodeCnt', 'None'];
+	var ExcludeNodeNameArray = ['NodeCnt'];
+	for (var i in NodeObj) {
+		if (NodeObj[i].Exclude === true) ExcludeNodeNameArray.push(i);
+	}
 	if (main && ExcludeNodeNameArray.indexOf(main) == -1) ExcludeNodeNameArray.push(main);
 	console.log('Will Exclude : ');
 	console.log(ExcludeNodeNameArray);
 
-	var ChildNodeNameArray = GetRandomNodeNameArray(NodeObj, n, ExcludeNodeNameArray);
+	var ChildNodeNameArray = [];
+	
+	ChildNodeNameArray = ChildNodeNameArray.concat(GetRandomNodeNameArray(NodeObj, n, ExcludeNodeNameArray));
 	console.log('Initial Display : ');
 	console.log(ChildNodeNameArray);
 	ChangeMain(NodeObj, main, ChildNodeNameArray);
