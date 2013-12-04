@@ -1,6 +1,25 @@
+
+header {
+	font-size: 2em;
+	position: absolute;
+	top: 0%;
+	margin-top: 0.5em;
+	margin-left: 0.5em;
+}
+
+footer {
+	font-size: 1em;
+	position: absolute;
+	top: 100%;
+	margin-top: -2em;
+}
+
+
+
 /*class = {"Node", "Main", "Parent", "Child"}*/
 
 .Node {
+	/*referenced : http://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/*/
 	/*for positioning center*/
 	position:  fixed;
 	top: 50%;
@@ -23,6 +42,8 @@
 
 	transform: matrix(1,0,0,1,0,0);
 	-webkit-transform: matrix(1,0,0,1,0,0);
+
+	box-shadow: 5px 5px 10px 2px rgba(196, 196, 196, 1.0);
 }
 
 /*지금은 Child, Parent 에 동일한 스타일을 부여했으나, 추후에 다르게 할 수도 있으므로.. 일단 클래스 다르 부여.*/
@@ -46,3 +67,23 @@
 	/*글자는 크기 줄이면 안 됨.*/
 	font-size: 150%;
 }
+
+
+
+
+#None {
+	opacity: 0.0;
+}
+
+
+
+
+#Main.Child .Parent {
+	transform:
+	scale(0.75, 0.75);
+	-webkit-transform:
+	scale(0.75, 0.75);
+	/*글자는 크기 줄이면 안 됨.*/
+	font-size: 150%;
+}
+

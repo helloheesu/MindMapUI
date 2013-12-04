@@ -11,6 +11,7 @@ ColorList = ["#F38630", "#69D2E7", "#E0E4CC", "#FA6900", "#A7DBD8"];
 
 ///// DB가 없으므로 전역변수 .... 헣헣 /////
 Contents = {'NodeCnt':0};
+Contents['None'] = {'Content':'', 'Depth':0, 'Parent':null, 'Child':[]}
 Contents['Node0'] = {'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
 
 function AddChildNode(NodeObj, Parent, Content) {
@@ -58,15 +59,16 @@ console.log(Contents);
 
 ////////////////// Positioning Nodes to HTML //////////////////
 
-function ChangeMain(NodeObj, Name, ChildNameArray) {
-	if (!Name) { console.log("ChangeMain : No Name Input"); return; }
-	if (typeof NodeObj[Name] === "undefined") { console.log("ChangeMain : Name undefined"); return; }
+function ChangeMain(NodeObj, MainName, ChildNameArray) {
+	document.getElementById('wrap').innerHTML = "";
+	if (!MainName) { console.log("ChangeMain : No MainName Input"); return; }
+	if (typeof NodeObj[MainName] === "undefined") { console.log("ChangeMain : MainName undefined"); return; }
 
 	console.log("Creating Main");
-	var MainElement = GetNewNodeElement(NodeObj, Name, 'Main', ColorList);
+	var MainElement = GetNewNodeElement(NodeObj, MainName, 'Main', ColorList);
 	document.getElementById('wrap').appendChild(MainElement);
 
-	if (!ChildNameArray) ChildNameArray = NodeObj[Name].Child;
+	if (!ChildNameArray) ChildNameArray = NodeObj[MainName].Child;
 
 	var ChildElementArray = [];
 	for (var i = 0; i < ChildNameArray.length; i++) {
@@ -76,8 +78,8 @@ function ChangeMain(NodeObj, Name, ChildNameArray) {
 	}
 
 	// 부모 노드를 배열의 맨 앞에 넣는다.
-	if (NodeObj[Name].Parent) {
-		ChildElementArray.unshift(GetNewNodeElement(NodeObj, NodeObj[Name].Parent, 'Parent', ColorList));
+	if (NodeObj[MainName].Parent) {
+		ChildElementArray.unshift(GetNewNodeElement(NodeObj, NodeObj[MainName].Parent, 'Parent', ColorList));
 		document.getElementById('wrap').appendChild(ChildElementArray[0]);
 	}
 
@@ -89,7 +91,7 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	var Element = document.createElement('div');
 	Element.id = Name;
 	Element.className = 'Node ';
-	Element.className += ClassType+' ';
+	if (ClassType) Element.className += ClassType+' ';
 	Element.innerHTML = NodeObj[Name].Content;
 	if (ColorArray) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
 	console.log(Element);
@@ -132,37 +134,30 @@ function MakeCircle(ElementArray, ParentRadius, MarginRadius) {
 
 ////////////////// Selecting Random Nodes for Initial Loading //////////////////
 
-function GetRandomNodeNameArray(NodeObj, n, ExcludeCnt) {
+function GetRandomNodeNameArray(NodeObj, howMany, ExcludeArray) {
 	
 	var NameArray = []
 	for (name in NodeObj) {
 		NameArray.push(name);
 	}
 
-	if (!ExcludeCnt) return ShuffleArray(NameArray).splice(0, n);
-
+	if (!ExcludeArray) return ShuffleArray(NameArray).splice(0, howMany);
 
 	////// Excluding Elements /////
-	var OriginArgCnt = 3;
-
-	// n, ExcludeCnt 이 너무 큰지 조사하고 로그 출력. 하지만 종료시키진 않음. 돌아가긴 한다, 결과가 원하는 바와 다를 순 있지만.
-	if (NameArray.length - ExcludeCnt < n) { console.log("GetRandomNodeNameArray : n is too large."); }
-	if (arguments.length - OriginArgCnt < ExcludeCnt) { 
-		console.log("GetRandomNodeNameArray : ExcludeCnt is too large.");
-		ExcludeCnt = arguments.length - OriginArgCnt;
-	}
+	// howMany 값이 너무 큰지 조사하고 로그 출력. 하지만 종료시키진 않음. 돌아가긴 한다, 기대한 것보다 적은 개수가 반환될 수 있긴 하지만.
+	if (NameArray.length - ExcludeArray.length < howMany) { console.log("GetRandomNodeNameArray : howMany is too large."); }
 
 	NameArray = ShuffleArray(NameArray);
 
-	for (var i = 0; i < ExcludeCnt; i++) {
-		var index = NameArray.indexOf(arguments[i+OriginArgCnt]);
+	for (var i = 0; i < ExcludeArray.length; i++) {
+		var index = NameArray.indexOf(ExcludeArray[i]);
 		if (index >= 0) {
 			var removed = NameArray.splice(index, 1);
 			console.log("Removed "+removed);				
 		}
 	}
 
-	return NameArray.splice(0, n);
+	return NameArray.splice(0, howMany);
 }
 
 // referenced : http://stackoverflow.com/questions/3718282/javascript-shuffling-objects-inside-an-object-randomize/
@@ -180,9 +175,19 @@ function ShuffleArray(sourceArray) {
 function Init(n, NodeObj, main) {
 	if (!NodeObj) NodeObj = Contents;
 	if (!n) {n = 7;}
-	if (!main) main = 'Node0';
+	if (!main) main = 'None';
 	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
-	ChangeMain( NodeObj, main, GetRandomNodeNameArray(NodeObj, n, 2, 'NodeCnt', 'Node0') );
+
+	var ExcludeNodeNameArray = ['NodeCnt', 'None'];
+	if (main && ExcludeNodeNameArray.indexOf(main) == -1) ExcludeNodeNameArray.push(main);
+	console.log('Will Exclude : ');
+	console.log(ExcludeNodeNameArray);
+
+	var ChildNodeNameArray = GetRandomNodeNameArray(NodeObj, n, ExcludeNodeNameArray);
+	console.log('Initial Display : ');
+	console.log(ChildNodeNameArray);
+	ChangeMain(NodeObj, main, ChildNodeNameArray);
+
 	var ChildNodes = document.getElementsByClassName('Child');
 	for (var i = 0; i < ChildNodes.length; i++) {
 		var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
