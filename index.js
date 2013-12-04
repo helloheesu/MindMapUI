@@ -32,7 +32,10 @@ BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/38
 
 ///// DB가 없으므로 전역변수 .... 헣헣 /////
 Contents = {'NodeCnt':0};
-Contents['None'] = {'Content':'', 'Depth':0, 'Parent':null, 'Child':[]};
+Contents['None'] = {'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <p>졸려</p> </object>'};
+// referenced : http://jwcross.tistory.com/31
+// chrome, safari 에서는 alt 속성이 안 먹는다 ㅜㅜ
+// Contents['None'] = {'Content':'<img alt="sleepy" src="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1"/>'};
 Contents['Node0'] = {'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
 
 function AddChildNode(NodeObj, Parent, Content) {
@@ -113,8 +116,8 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	Element.id = Name;
 	Element.className = 'Node ';
 	if (ClassType) Element.className += ClassType+' ';
-	Element.innerHTML = NodeObj[Name].Content;
-	if (ColorArray) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
+	if (NodeObj[Name].Content) Element.innerHTML = NodeObj[Name].Content;
+	if (ColorArray && (NodeObj[Name].Depth || NodeObj[Name].Depth===0)) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
 	console.log(Element);
 	// appendChild 도 공통된 행위라 GetNewNodeElement 에 묶을까 했으나, 받아서 직접 넣는 게 사용자 입장에서 맞는 것 같아서 일부러 뺌. 마치 new 로 받아오면 AddChild 는 직접 해 줘야 하듯이 헣헣
 	// document.getElementById('wrap').appendChild(Element);
