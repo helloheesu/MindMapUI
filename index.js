@@ -38,10 +38,10 @@ Contents = {'NodeCnt':0};
 // chrome, safari 에서는 alt 속성이 안 먹는다 ㅜㅜ
 // Contents['None'] = {'Content':'<img alt="sleepy" src="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1"/>'};
 Contents['Empty'] = {'Exclude':true, 'Content':''};
-Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <span style="font-size:2em;">졸려</span> </object>'};
+Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <object data="res/onDogFoot.png" type="image/png" style="margin-top:-20px;margin-left:-20px;"> <span style="font-size:2em;">졸려</span> </object> </object>'};
 Contents['Add'] = {'Exclude':true, 'Content':'<span style="font-size:5em; color:gray;">+</span>'};
 // 'Node0' 은 어차피 항상 자식. (-> 'Exclude':true )
-Contents['Node0'] = {'Exclude':true, 'Content':'Home', 'Depth':0, 'Parent':null, 'Child':[]};
+Contents['Node0'] = {'Exclude':true, 'Content':'Node0', 'Depth':0, 'Parent':null, 'Child':[]};
 
 function AddChildNode(NodeObj, Parent, Content) {
 	// 나중에 error 처리를 위해 (예외처리에 관한)if 문을 따로 둠. 일단은 console 창에서 찍는 걸로.
@@ -64,12 +64,12 @@ function AddChildNode(NodeObj, Parent, Content) {
 
 // test 용으로 hard coding.
 // file IO 를 배워서, 현재 파일이 존재하는 서버에 로그인정보를 받고, 아이디명.txt 파일에 xml 식으로 저장하면..... 되지 않을 까.........
-AddChildNode(Contents, 'Node0', "hweofhqwobvncowabndasfwergvqergvq3wrvfvco;wqbnao;vcbnwobnvco;qwbncovj;weq");
-AddChildNode(Contents, 'Node0', "qhwoefbqwo;bvo;qwabsvcj;asndv;nql;nqo;w");
+AddChildNode(Contents, 'Node0');
+AddChildNode(Contents, 'Node0');
 AddChildNode(Contents, 'Node0');
 AddChildNode(Contents, 'Node0-1');
-AddChildNode(Contents, 'Node0-1', "adofchqwonvcoqw;nvo;qwnfqc[owinefoqw;c");
-AddChildNode(Contents, 'Node0-1', "");
+AddChildNode(Contents, 'Node0-1');
+AddChildNode(Contents, 'Node0-1');
 AddChildNode(Contents, 'Node0-2');
 AddChildNode(Contents, 'Node0-2');
 AddChildNode(Contents, 'Node0-2');
@@ -133,9 +133,12 @@ function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) 
 
 	var LongerWidth = (document.getElementsByClassName('Main')[0].offsetWidth > document.getElementsByClassName('Main')[0].offsetHeight) ? document.getElementsByClassName('Main')[0].offsetWidth : document.getElementsByClassName('Main')[0].offsetHeight;
 	MakeCircle(ChildElementArray, LongerWidth*0.5);
+
+	MakeNodesClickable();
 }
 
 function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
+	// createDocumentFragment() ?????????? 가 나은가.
 	var Element = document.createElement('div');
 	Element.id = Name;
 	Element.className = 'Node ';
@@ -152,9 +155,9 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	return Element;
 }
 
-// referenced : http://hugogiraudel.com/2013/04/02/items-on-circle/
-///// 개선 필요 .. 반지름이 미묘하게 안 맞음 ㅜㅜ 노드가 여러개일 땐 별로 티가 안 나는데, 3개 정도일 때 치명적 ㅜㅜ /////
 function MakeCircle(ElementArray, ParentRadius, MarginRadius) {
+	// referenced : http://hugogiraudel.com/2013/04/02/items-on-circle/
+	///// 개선 필요 .. 반지름이 미묘하게 안 맞음 ㅜㅜ 노드가 여러개일 땐 별로 티가 안 나는데, 3개 정도일 때 치명적 ㅜㅜ /////
 	console.log("Circle Start");
 	for (var i=0; i<ElementArray.length; i++) {
 		// += 이 안 됨 ㅜㅜ : Uncaught SyntaxError: Unexpected token += 
@@ -255,3 +258,25 @@ function Init(n, NodeObj, main, bgArray) {
 	var randNum = Math.floor(Math.random() * bgArray.length);
 	document.getElementById('bg').style.backgroundImage="url("+bgArray[randNum]+")";
 }
+
+function ResizeNodes() {
+	// 귀찮다 나중에 해야지
+	// --> if
+	// 윈도우 크기가 (x, y) 둘 중 하나라도 500(메인+자식들 이 이루는 큰 원의 직경)보다 작아지면,
+	// 'Wrap'에 scale을 곱해서 전체 크기를 줄여버리자.......?
+	// --> else
+	// 근데 다시 커지면 500 까지만 돌려놔야 ....?
+}
+
+window.addEventListener('load', function(e){Init();}, false);
+window.addEventListener('resize', function(e){ResizeNodes();}, false);
+
+function MakeNodesClickable() {
+	var NodeList = document.getElementsByClassName('Node');
+	for (var i=0; i<NodeList.length; i++) {
+		NodeList[i].addEventListener('click', function(e){debugger; ChangeMain(Contents, e.target.id);}, false);
+	}
+}
+
+
+// img alt 가 안 먹길래 해 둔 <obejct><p></p></object> 를 img.onError 로 바꿔야겠다. 나중에 해야지.

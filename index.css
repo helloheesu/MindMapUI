@@ -43,6 +43,7 @@ footer {
 	border: 1px solid transparent;
 
 	/*for positioning center*/
+	/*!!!!!!!!! 화면 크기가 작아서 안 보이는데도 스크롤이 안 됨 ㅜㅜ*/
 	position:  fixed;
 	top: 50%;
 	left: 50%;
@@ -59,7 +60,7 @@ footer {
 	transform: matrix(1,0,0,1,0,0);
 	-webkit-transform: matrix(1,0,0,1,0,0);
 
-	box-shadow: 5px 5px 10px 2px rgba(196, 196, 196, 1.0);
+	box-shadow: 3px 3px 2px rgba(196, 196, 196, 1.0);
 }
 
 /*지금은 Child, Parent 에 동일한 스타일을 부여했으나, 추후에 다르게 할 수도 있으므로.. 일단 클래스 다르 부여.*/
