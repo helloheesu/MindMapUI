@@ -279,4 +279,6 @@ function MakeNodesClickable() {
 }
 
 
+// node-0(루트) 에는 none(맨처음랜덤페이지) 이 붙어있게 해야지.
 // img alt 가 안 먹길래 해 둔 <obejct><p></p></object> 를 img.onError 로 바꿔야겠다. 나중에 해야지.
+// css - hover 내용 펼치기 (maxWidth -> width) 도 해야지.
