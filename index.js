@@ -1,47 +1,50 @@
-// 기존 keyword 와 겹치지 않게 하려고 모든 변수명, 함수명 을 대문자로 시작하게(+CamelCase 은 cpp 습관 때문에 헣헣) 했습니다.
+/******
+* TODO : mvc 건 뭐건 어쨋든 '분리'.. 객체지향................
+* id별로 정보를 관리하는 db가 있고, httpRequest(someName.php) 같은걸로 그 디비에 정보를 추가, 삭제, 그리고 당연히 불러올 수 있도록.
+* 그래서 받은 정보를 인자로 넘기면 element로 만들고, 배치하도록. 또, element를 resizable하도록(responsive!).
+* 그리고 element 를 인자로 넘겨서 걔네를 클릭하면가운데로배치하게, 마우스올리면키워서내용더보이게, 키보드입력도받게, 추가.
+* 이걸 managing 하는 main함수등을 만들어야.
+******/
+/*****
+* 그리고 나중에는 한 눈에 다 보여주는 기능도 추가.
+* <ol>,<li>tag 써서 처리. 해당 번호를 키보드로 누르면 클릭과 같은 효과.
+* html 파일로 내보내주고 읽는것도 추가.
+*****/
 
-
-
-// Color Palette from : http://www.colourlovers.com/palette/92095/Giant_Goldfish
 ColorList = ["#F38630", "#69D2E7", "#E0E4CC", "#FA6900", "#A7DBD8"];
-// Background Pattern from : http://www.colourlovers.com/pattern/
-// Licences Checked. I'll not use these in commercial.
-
-BackgroundList = [];
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3822/3822133.png?1377093078");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3816/3816031.png?1376890972");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/582/582552.png?1250954754");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/328/328710.png?1332797054");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1101/1101098.png?1287436878");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/89/89366.png?1321378552");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1181/1181271.png?1291485803");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1684/1684015.png?1312140286");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2290/2290455.png?1335954364");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1631/1631873.png?1340389562");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1462/1462099.png?1352412939");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2340/2340229.png?1332799455");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2445/2445745.png?1335447079");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2639/2639257.png?1340222595");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/2168/2168138.png?1328143893");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3898/3898458.png?1380324096");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3396/3396019.png?1361211310");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/1776/1776807.png?1353263169");
-BackgroundList.push("http://colourlovers.com.s3.amazonaws.com/images/patterns/3878/3878314.png?1379402588");
+BackgroundList = [
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/3822/3822133.png?1377093078",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/3816/3816031.png?1376890972",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/582/582552.png?1250954754",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/328/328710.png?1332797054",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1101/1101098.png?1287436878",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/89/89366.png?1321378552",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1181/1181271.png?1291485803",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1684/1684015.png?1312140286",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/2290/2290455.png?1335954364",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1631/1631873.png?1340389562",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1462/1462099.png?1352412939",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/2340/2340229.png?1332799455",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/2445/2445745.png?1335447079",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/2639/2639257.png?1340222595",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/2168/2168138.png?1328143893",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/3898/3898458.png?1380324096",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/3396/3396019.png?1361211310",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/1776/1776807.png?1353263169",
+"http://colourlovers.com.s3.amazonaws.com/images/patterns/3878/3878314.png?1379402588"
+];
 
 ////////////////// Adding Nodes to Array //////////////////
 
-///// DB가 없으므로 전역변수 .... 헣헣 /////
-
-// 'NodeCnt' 는 Exclude 에서 항상 신경 써 줘야 함 ㅜㅜ
 Contents = {'NodeCnt':0};
-// referenced : http://jwcross.tistory.com/31
-// chrome, safari 에서는 alt 속성이 안 먹는다 ㅜㅜ
-// Contents['None'] = {'Content':'<img alt="sleepy" src="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1"/>'};
+
 Contents['Empty'] = {'Exclude':true, 'Content':''};
 Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <object data="res/onDogFoot.png" type="image/png" style="margin-top:-20px;margin-left:-20px;"> <span style="font-size:2em;">졸려</span> </object> </object>'};
 Contents['Add'] = {'Exclude':true, 'Content':'<span style="font-size:5em; color:gray;">+</span>'};
-// 'Node0' 은 어차피 항상 자식. (-> 'Exclude':true )
-Contents['Node0'] = {'Exclude':true, 'Content':'Node0', 'Depth':0, 'Parent':null, 'Child':[]};
+Contents['Adding'] = {'Exclude':true, 'Content':'<Input id="AddInput" type="text" value=""><br><Input id="AddButton" type="button" value="Add"><br><Input id="BackButton" type="button" value="Back">'};
+Contents['Node0'] = {'Exclude':true, 'Content':'Heesu', 'Depth':0, 'Parent':null, 'Child':[]};
+console.log("Contents : ");
+console.log(Contents);
 
 function AddChildNode(NodeObj, Parent, Content) {
 	// 나중에 error 처리를 위해 (예외처리에 관한)if 문을 따로 둠. 일단은 console 창에서 찍는 걸로.
@@ -97,25 +100,28 @@ function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) 
 	var MainElement = GetNewNodeElement(NodeObj, MainName, 'Main', ColorList);
 	document.getElementById('wrap').appendChild(MainElement);
 
+	if(MainName === 'Adding') return;
+	if (!ChildNameArray) ChildNameArray = NodeObj[MainName].Child | [];
 	if (!ChildNameArray) ChildNameArray = NodeObj[MainName].Child;
 	if (bShuffleChild===true) ChildNameArray = GetShuffledArray(ChildNameArray);
 
 	var ChildElementArray = [];
 	for (var i = 0; i < ChildNameArray.length; i++) {
 		console.log("Creating Child "+i);
-		ChildElementArray[i] = GetNewNodeElement(NodeObj, ChildNameArray[i], 'Child', ColorList);
+		ChildElementArray[i] = GetNewNodeElement(NodeObj, ChildNameArray[i], 'Child Clickable', ColorList);
 		document.getElementById('wrap').appendChild(ChildElementArray[i]);
 	}
 
+	// 항상 들어가는 것들. (add, root, parent).
 	// 부모 노드를 배열의 맨 앞에 넣는다.
 	if (NodeObj[MainName].Parent) {
-		ChildElementArray.unshift(GetNewNodeElement(NodeObj, NodeObj[MainName].Parent, 'Parent', ColorList));
+		ChildElementArray.unshift(GetNewNodeElement(NodeObj, NodeObj[MainName].Parent, 'Parent Clickable', ColorList));
 		document.getElementById('wrap').appendChild(ChildElementArray[0]);
 	}
 
 	// 추가 노드를 배열에 넣는다.
 	if (bAddable===true) {
-		ChildElementArray.push(GetNewNodeElement(NodeObj, 'Add', 'Parent', ColorList));
+		ChildElementArray.push(GetNewNodeElement(NodeObj, 'Add', 'Add', ColorList));
 		document.getElementById('wrap').appendChild(ChildElementArray[ChildElementArray.length-1]);
 	}
 
@@ -123,10 +129,12 @@ function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) 
 	// !!!!!! (루트 이름이 'Node0'이라는 가정이 들어 감)
 	if (NodeObj[MainName].Parent != 'Node0' && MainName!='Node0') {
 		if (NodeObj[MainName].Parent) {
-			ChildElementArray.push(GetNewNodeElement(NodeObj, 'Node0', 'Parent', ColorList));
+			// 'Parent'라는 클래스 일단 없앰. 모두 Child 취급하기로.
+			ChildElementArray.push(GetNewNodeElement(NodeObj, 'Node0', 'Parent Clickable', ColorList));
 			document.getElementById('wrap').appendChild(ChildElementArray[ChildElementArray.length-1]);
 		} else {
-			ChildElementArray.unshift(GetNewNodeElement(NodeObj, 'Node0', 'Parent', ColorList));
+			// 'Parent'라는 클래스 일단 없앰. 모두 Child 취급하기로.
+			ChildElementArray.unshift(GetNewNodeElement(NodeObj, 'Node0', 'Parent Clickable', ColorList));
 			document.getElementById('wrap').appendChild(ChildElementArray[0]);
 		}
 	}
@@ -144,6 +152,7 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	Element.className = 'Node ';
 	if (ClassType) Element.className += ClassType+' ';
 	if (NodeObj[Name].Content) Element.innerHTML = NodeObj[Name].Content;
+	// depth 를 설정안하면 배경 설정도 안 해주게.
 	if (NodeObj[Name].Depth || NodeObj[Name].Depth===0) {
 		if (ColorArray) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
 	} else {
@@ -191,8 +200,8 @@ function MakeCircle(ElementArray, ParentRadius, MarginRadius) {
 
 function GetRandomNodeNameArray(NodeObj, howMany, ExcludeArray) {
 	
-	var NameArray = []
-	for (name in NodeObj) {
+	var NameArray = [];
+	for (var name in NodeObj) {
 		NameArray.push(name);
 	}
 
@@ -208,7 +217,7 @@ function GetRandomNodeNameArray(NodeObj, howMany, ExcludeArray) {
 		var index = NameArray.indexOf(ExcludeArray[i]);
 		if (index >= 0) {
 			var removed = NameArray.splice(index, 1);
-			console.log("Removed "+removed);				
+			console.log("Removed "+removed);
 		}
 	}
 
@@ -253,7 +262,7 @@ function Init(n, NodeObj, main, bgArray) {
 	for (var i = 0; i < ChildNodes.length; i++) {
 		var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
 		ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.3+")";
-	};
+	}
 
 	var randNum = Math.floor(Math.random() * bgArray.length);
 	document.getElementById('bg').style.backgroundImage="url("+bgArray[randNum]+")";
@@ -272,12 +281,31 @@ window.addEventListener('load', function(e){Init();}, false);
 window.addEventListener('resize', function(e){ResizeNodes();}, false);
 
 function MakeNodesClickable() {
-	var NodeList = document.getElementsByClassName('Node');
+	var NodeList = document.getElementsByClassName('Clickable');
 	for (var i=0; i<NodeList.length; i++) {
-		NodeList[i].addEventListener('click', function(e){debugger; ChangeMain(Contents, e.target.id);}, false);
+		NodeList[i].addEventListener('click', function(e){ChangeMain(Contents, e.target.id, false, false, true);}, false);
 	}
+	var AddElement = document.getElementsByClassName('Add')[0];
+	if(AddElement) AddElement.addEventListener('click', ClickedAdd, false);
 }
 
+function ClickedAdd(e) {
+	var MainName = document.getElementsByClassName('Main')[0].id;
+	ChangeMain(Contents, 'Adding');
+	var ClickedAddButton = function(e) {
+		Content = document.getElementById('AddInput').value;
+		if (!Content) { alert('Input Content!'); return; }
+		
+		AddChildNode(Contents, MainName, Content);
+		ChangeMain(Contents, MainName, false, false, true);
+	};
+	var ClickedBackButton = function(e) {
+		ChangeMain(Contents, MainName, false, false, true);
+	};
+	document.getElementById('AddButton').addEventListener('click', ClickedAddButton, false);
+	document.getElementById('BackButton').addEventListener('click', ClickedBackButton, false);
+	console.log('hello');
+}
 
 // node-0(루트) 에는 none(맨처음랜덤페이지) 이 붙어있게 해야지.
 // img alt 가 안 먹길래 해 둔 <obejct><p></p></object> 를 img.onError 로 바꿔야겠다. 나중에 해야지.
