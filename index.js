@@ -65,29 +65,6 @@ function AddChildNode(NodeObj, Parent, Content) {
 	NodeObj['NodeCnt']++;
 }
 
-// test 용으로 hard coding.
-// file IO 를 배워서, 현재 파일이 존재하는 서버에 로그인정보를 받고, 아이디명.txt 파일에 xml 식으로 저장하면..... 되지 않을 까.........
-AddChildNode(Contents, 'Node0');
-AddChildNode(Contents, 'Node0');
-AddChildNode(Contents, 'Node0');
-AddChildNode(Contents, 'Node0-1');
-AddChildNode(Contents, 'Node0-1');
-AddChildNode(Contents, 'Node0-1');
-AddChildNode(Contents, 'Node0-2');
-AddChildNode(Contents, 'Node0-2');
-AddChildNode(Contents, 'Node0-2');
-AddChildNode(Contents, 'Node0-2');
-AddChildNode(Contents, 'Node0-2');
-AddChildNode(Contents, 'Node0-2-1');
-AddChildNode(Contents, 'Node0-2-1');
-AddChildNode(Contents, 'Node0-2-1');
-AddChildNode(Contents, 'Node0-2-1');
-AddChildNode(Contents, 'Node0-2-1');
-AddChildNode(Contents, 'Node0-2-1');
-
-console.log(Contents);
-
-
 
 ////////////////// Positioning Nodes to HTML //////////////////
 
@@ -121,7 +98,7 @@ function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) 
 
 	// 추가 노드를 배열에 넣는다.
 	if (bAddable===true) {
-		ChildElementArray.push(GetNewNodeElement(NodeObj, 'Add', 'Add', ColorList));
+		ChildElementArray.push(GetNewNodeElement(NodeObj, 'Add', 'Parent', ColorList));
 		document.getElementById('wrap').appendChild(ChildElementArray[ChildElementArray.length-1]);
 	}
 
@@ -154,7 +131,8 @@ function GetNewNodeElement(NodeObj, Name, ClassType, ColorArray) {
 	if (NodeObj[Name].Content) Element.innerHTML = NodeObj[Name].Content;
 	// depth 를 설정안하면 배경 설정도 안 해주게.
 	if (NodeObj[Name].Depth || NodeObj[Name].Depth===0) {
-		if (ColorArray) Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
+		if (!ColorArray) ColorArray = ColorList;
+		Element.style.backgroundColor = ColorArray[NodeObj[Name].Depth % ColorArray.length];
 	} else {
 		Element.style.boxShadow = "0 0";
 	}
@@ -182,6 +160,7 @@ function MakeCircle(ElementArray, ParentRadius, MarginRadius) {
 		}
 		
 		console.log("Circle "+i);
+		console.log(ElementArray[i]);
 		console.log("Degree : "+Degree);
 		console.log("Radius : "+Radius);
 
@@ -236,7 +215,134 @@ function GetShuffledArray(sourceArray) {
     return sourceArray;
 }
 
-function Init(n, NodeObj, main, bgArray) {
+function Init () {
+	var randBgNum = Math.floor(Math.random() * BackgroundList.length);
+	document.getElementById('bg').style.backgroundImage="url("+BackgroundList[randBgNum]+")";
+	
+	document.getElementById('wrap').innerHTML = "";
+	var NodeObj = {'New':{'Depth':0}, 'Test':{'Depth':1}, 'Load':{'Depth':2}};
+	var DepthArray = GetShuffledArray([0,1,2]);
+	var ElementArray = [];
+	for (var i in NodeObj) {
+		NodeObj[i].Content = i;
+		NodeObj[i].Depth = DepthArray.shift();
+		ElementArray.push(GetNewNodeElement(NodeObj, i));
+	}
+
+	for (var i = 0; i < ElementArray.length; i++) {
+		document.getElementById('wrap').appendChild(ElementArray[i]);
+	}
+	var radius = ElementArray[0].offsetWidth*0.5;
+	MakeCircle(ElementArray, radius*0.25, radius*0.87); // (root3)/2 is about 0.866;
+	// debugger;
+	document.getElementById('Test').addEventListener('click', InitTest, false);
+	document.getElementById('New').addEventListener('click', InitNew, false);
+	document.getElementById('Load').addEventListener('click', InitLoadFile, false);
+}
+
+function InitLoadFile(e) {
+	var randBgNum = Math.floor(Math.random() * BackgroundList.length);
+	document.getElementById('bg').style.backgroundImage="url("+BackgroundList[randBgNum]+")";
+
+	// referenced : http://www.html5rocks.com/en/tutorials/file/dndfiles/	
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+		document.getElementById('wrap').innerHTML = "";
+		var randDepthNum = Math.floor(Math.random() * ColorList.length);
+		// var LoadElement = document.createElement('div');
+		// LoadElement.innerHTML = '<input type="file" id="files" name="files[]" multiple /><br><output id="list"></output>';
+		// LoadElement.className = 'Node';
+		var LoadElement = GetNewNodeElement({'Load':{'Depth':randDepthNum,'Content':'<input type="file" id="files" style="display:none;"/>'}}, 'Load');
+		LoadElement.style.wordBreak = 'Normal';
+		LoadElement.style.overflow = 'auto';
+		LoadElement.innerHTML += '<input type="button" id="SelectFile" value="Choose File" onclick="">';
+		LoadElement.innerHTML += '<output id="list"></output>';
+		document.getElementById('wrap').appendChild(LoadElement);
+		document.getElementById('SelectFile').addEventListener('click', function(){document.getElementById("files").click();}, false);
+		console.log("before : "+LoadElement.offsetWidth);
+		console.log("after : "+LoadElement.scrollWidth);
+		var dWidth = LoadElement.scrollWidth - LoadElement.offsetWidth;
+		LoadElement.style.width = LoadElement.scrollWidth+"px";
+		console.log(dWidth);
+		var EmptyElement = document.createElement('div');
+		MakeCircle([EmptyElement, LoadElement, EmptyElement, EmptyElement], -dWidth, 0);
+		// debugger;
+		// document.getElementById('wrap').appendChild(LoadElement);
+		// appendChild 를 하고 난 다음에야 offsetWidth, scrollWidth 가 정해지는 듯.
+		var clickBtn = function(argument) {
+			//
+		};
+		var handleFileSelect = function(files) {		// 함수자체는 여러개도 처리 가능하지만, 하나만 입력받을 것임.
+			var output = [];
+			for (var i = 0; files[i]; i++) {
+				f=files[i];
+				output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+					f.size, ' bytes, last modified: ',
+					f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+					'</li>');
+			}
+			document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+		};
+		var handleDragOver = function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+		};
+
+		// Setup the dnd listeners.
+		var dropZone = document.getElementById('Load');
+		dropZone.addEventListener('dragover', handleDragOver, false);
+		dropZone.addEventListener('drop', function(e){ e.stopPropagation(); e.preventDefault(); handleFileSelect(e.dataTransfer.files); }, false);
+		document.getElementById('files').addEventListener('change', function(e){handleFileSelect(e.target.files);}, false);
+	} else {
+		alert('The File APIs are not fully supported in this browser.');
+		document.getElementById('wrap').removeChild(e.target);
+	}
+}
+
+function InitTest() {
+	AddChildNode(Contents, 'Node0');
+	AddChildNode(Contents, 'Node0');
+	AddChildNode(Contents, 'Node0');
+	AddChildNode(Contents, 'Node0-1');
+	AddChildNode(Contents, 'Node0-1');
+	AddChildNode(Contents, 'Node0-1');
+	AddChildNode(Contents, 'Node0-2');
+	AddChildNode(Contents, 'Node0-2');
+	AddChildNode(Contents, 'Node0-2');
+	AddChildNode(Contents, 'Node0-2');
+	AddChildNode(Contents, 'Node0-2');
+	AddChildNode(Contents, 'Node0-2-1');
+	AddChildNode(Contents, 'Node0-2-1');
+	AddChildNode(Contents, 'Node0-2-1');
+	AddChildNode(Contents, 'Node0-2-1');
+	AddChildNode(Contents, 'Node0-2-1');
+	AddChildNode(Contents, 'Node0-2-1');
+	InitLoad();
+}
+
+function InitNew() {
+	var randBgNum = Math.floor(Math.random() * BackgroundList.length);
+	document.getElementById('bg').style.backgroundImage="url("+BackgroundList[randBgNum]+")";
+	
+	document.getElementById('wrap').innerHTML = "";
+	var randDepthNum = Math.floor(Math.random() * ColorList.length);
+	var InitElement = GetNewNodeElement({'Init':{'Depth':randDepthNum,'Content':'<p>What\'s your name?</p><Input id="AddInput" type="text" value=""><br><Input id="AddButton" type="button" value="Add"><br><Input id="BackButton" type="button" value="Back">'}}, 'Init');
+	InitElement.style.wordBreak = 'Normal';
+	document.getElementById('wrap').appendChild(InitElement);
+
+	var ClickedAddButton = function(e) {
+		Name = document.getElementById('AddInput').value;
+		if (!Name) { alert('Input Your Name!'); return; }
+		Contents['Node0'].Content = Name;
+		ChangeMain(Contents, 'Node0', false, false, true);
+	};
+	document.getElementById('AddButton').addEventListener('click', ClickedAddButton, false);
+	document.getElementById('BackButton').addEventListener('click', Init, false);
+}
+
+function InitLoad(n, NodeObj, main, bgArray) {
+	// var NodeObj = NodeObj | Contents;
+	// 안 된다 위의 코드는..ㅜㅜ undefined 가 그냥 대입 돼 버리나보다...
 	if (!NodeObj) NodeObj = Contents;
 	if (!n) {n = 6;}
 	if (!main) main = 'None';
@@ -285,12 +391,13 @@ function MakeNodesClickable() {
 	for (var i=0; i<NodeList.length; i++) {
 		NodeList[i].addEventListener('click', function(e){ChangeMain(Contents, e.target.id, false, false, true);}, false);
 	}
-	var AddElement = document.getElementsByClassName('Add')[0];
+	var AddElement = document.getElementById('Add');
 	if(AddElement) AddElement.addEventListener('click', ClickedAdd, false);
 }
 
 function ClickedAdd(e) {
 	var MainName = document.getElementsByClassName('Main')[0].id;
+	Contents['Adding'].Depth = Contents[MainName].Depth + 1;
 	ChangeMain(Contents, 'Adding');
 	var ClickedAddButton = function(e) {
 		Content = document.getElementById('AddInput').value;
@@ -304,7 +411,6 @@ function ClickedAdd(e) {
 	};
 	document.getElementById('AddButton').addEventListener('click', ClickedAddButton, false);
 	document.getElementById('BackButton').addEventListener('click', ClickedBackButton, false);
-	console.log('hello');
 }
 
 // node-0(루트) 에는 none(맨처음랜덤페이지) 이 붙어있게 해야지.
