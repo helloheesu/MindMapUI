@@ -267,9 +267,6 @@ function InitLoadFile(e) {
 		// debugger;
 		// document.getElementById('wrap').appendChild(LoadElement);
 		// appendChild 를 하고 난 다음에야 offsetWidth, scrollWidth 가 정해지는 듯.
-		var clickBtn = function(argument) {
-			//
-		};
 		var handleFileSelect = function(files) {		// 함수자체는 여러개도 처리 가능하지만, 하나만 입력받을 것임. : input Element 에서 multiple 속성 x.
 			// 현재는 그냥 선택된 파일을 출력해주지만, 나름대로 parsing..... 해서 contents 에 넣어줄 생각.
 			var output = [];
