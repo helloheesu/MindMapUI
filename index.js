@@ -4,6 +4,7 @@
 * 그래서 받은 정보를 인자로 넘기면 element로 만들고, 배치하도록. 또, element를 resizable하도록(responsive!).
 * 그리고 element 를 인자로 넘겨서 걔네를 클릭하면가운데로배치하게, 마우스올리면키워서내용더보이게, 키보드입력도받게, 추가.
 * 이걸 managing 하는 main함수등을 만들어야.
+* var MainName = document.getElementsByClassName('Main')[0].id; 이런것도 getMainName 같은 함수만들어서 manager 같은 애들이 관리해주면 좋겠다....
 ******/
 /*****
 * 그리고 나중에는 한 눈에 다 보여주는 기능도 추가.
@@ -67,7 +68,6 @@ function AddChildNode(NodeObj, Parent, Content) {
 
 
 ////////////////// Positioning Nodes to HTML //////////////////
-
 function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) {
 	document.getElementById('wrap').innerHTML = "";
 	if (!MainName) { console.log("ChangeMain : No MainName Input"); return; }
@@ -118,7 +118,6 @@ function ChangeMain(NodeObj, MainName, ChildNameArray, bShuffleChild, bAddable) 
 
 	var LongerWidth = (document.getElementsByClassName('Main')[0].offsetWidth > document.getElementsByClassName('Main')[0].offsetHeight) ? document.getElementsByClassName('Main')[0].offsetWidth : document.getElementsByClassName('Main')[0].offsetHeight;
 	MakeCircle(ChildElementArray, LongerWidth*0.5);
-
 	MakeNodesClickable();
 }
 
@@ -271,7 +270,8 @@ function InitLoadFile(e) {
 		var clickBtn = function(argument) {
 			//
 		};
-		var handleFileSelect = function(files) {		// 함수자체는 여러개도 처리 가능하지만, 하나만 입력받을 것임.
+		var handleFileSelect = function(files) {		// 함수자체는 여러개도 처리 가능하지만, 하나만 입력받을 것임. : input Element 에서 multiple 속성 x.
+			// 현재는 그냥 선택된 파일을 출력해주지만, 나름대로 parsing..... 해서 contents 에 넣어줄 생각.
 			var output = [];
 			for (var i = 0; files[i]; i++) {
 				f=files[i];
@@ -335,6 +335,7 @@ function InitNew() {
 		if (!Name) { alert('Input Your Name!'); return; }
 		Contents['Node0'].Content = Name;
 		ChangeMain(Contents, 'Node0', false, false, true);
+		document.getElementById('header').innerHTML = '<a id="save">save</a>';
 	};
 	document.getElementById('AddButton').addEventListener('click', ClickedAddButton, false);
 	document.getElementById('BackButton').addEventListener('click', Init, false);
@@ -348,6 +349,10 @@ function InitLoad(n, NodeObj, main, bgArray) {
 	if (!main) main = 'None';
 	if (NodeObj['NodeCnt'] < n) n = NodeObj['NodeCnt'];
 	if (!bgArray) bgArray = BackgroundList;
+
+	var randNum = Math.floor(Math.random() * bgArray.length);
+	document.getElementById('bg').style.backgroundImage="url("+bgArray[randNum]+")";
+	document.getElementById('header').innerHTML = '<a id="save">save</a>';
 
 	var ExcludeNodeNameArray = ['NodeCnt'];
 	for (var i in NodeObj) {
@@ -369,9 +374,6 @@ function InitLoad(n, NodeObj, main, bgArray) {
 		var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
 		ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.3+")";
 	}
-
-	var randNum = Math.floor(Math.random() * bgArray.length);
-	document.getElementById('bg').style.backgroundImage="url("+bgArray[randNum]+")";
 }
 
 function ResizeNodes() {
@@ -392,7 +394,9 @@ function MakeNodesClickable() {
 		NodeList[i].addEventListener('click', function(e){ChangeMain(Contents, e.target.id, false, false, true);}, false);
 	}
 	var AddElement = document.getElementById('Add');
-	if(AddElement) AddElement.addEventListener('click', ClickedAdd, false);
+	if(AddElement) {AddElement.addEventListener('click', ClickedAdd, false);}
+	var SaveElement = document.getElementById('save');
+	if(SaveElement) {SaveElement.addEventListener('click', LetsSave, false);}
 }
 
 function ClickedAdd(e) {
@@ -412,6 +416,63 @@ function ClickedAdd(e) {
 	document.getElementById('AddButton').addEventListener('click', ClickedAddButton, false);
 	document.getElementById('BackButton').addEventListener('click', ClickedBackButton, false);
 }
+
+function LetsSave() {
+	var MainName = document.getElementsByClassName('Main')[0].id;
+	document.getElementById('header').innerHTML += '<br><a id="BackButton">back</a>';
+	document.getElementById('save').removeEventListener('click', LetsSave, false);
+	if(MainName == 'None') {
+		var ChildNameArray = [];
+		for (var i = 0; i < document.getElementsByClassName('Child').length; i++) {
+			ChildNameArray.push(document.getElementsByClassName('Child')[i].id);
+		}
+	}
+	var ClickedBackButton = function(e) {
+		var headerElement = document.getElementById('header');
+		document.getElementById('save').removeEventListener('click', SaveAsFile, false);
+		while(headerElement.childNodes.length > 1) { headerElement.removeChild(headerElement.childNodes[headerElement.childNodes.length-1]); }
+		if (MainName == 'None') {
+			ChangeMain(Contents, 'None', ChildNameArray);
+			var ChildNodes = document.getElementsByClassName('Child');
+			for (var i = 0; i < ChildNodes.length; i++) {
+				var RGB = document.defaultView.getComputedStyle(ChildNodes[i]).backgroundColor.match(/(\d+)/g);
+				ChildNodes[i].style.backgroundColor = "rgba("+RGB[0]+","+RGB[1]+","+RGB[2]+","+0.3+")";
+			}
+		} else { ChangeMain(Contents, MainName, false, false, true); }
+	};
+	document.getElementById('BackButton').addEventListener('click', ClickedBackButton, false);
+	var MakeList = function(Name) {
+		var liElement = document.createElement('li');
+		liElement.id = Name+'_li';
+		liElement.innerHTML = Contents[Name].Content;
+		var parentName = (Contents[Name].Parent)? Contents[Name].Parent : 'wrap';
+		document.getElementById(parentName+'_ol').appendChild(liElement);
+		if (!Contents[Name].Child) { return; }
+		var olElement = document.createElement('ol');
+		olElement.id = Name+'_ol';
+		document.getElementById(parentName+'_ol').appendChild(olElement);
+		for (var i=0; i < Contents[Name].Child.length; i++) {
+			var childName = Contents[Name].Child[i];
+			MakeList(childName);
+		}
+	};
+	var wrapElement = document.getElementById('wrap');
+	wrapElement.innerHTML = "";
+	var wrapOlElement = document.createElement('ol');
+	wrapOlElement.id = 'wrap'+'_ol';
+	wrapElement.appendChild(wrapOlElement);
+	MakeList('Node0');
+	
+	document.getElementById('save').addEventListener('click', SaveAsFile, false);
+}
+
+function SaveAsFile() {
+	alert('Save As HTML File!');
+	// 방법을 찾기도, 호환성 고려하기도, 귀찮아서 그냥 라이브러리를 쓸 생각이다.
+	// https://github.com/eligrey/FileSaver.js
+}
+
+
 
 // node-0(루트) 에는 none(맨처음랜덤페이지) 이 붙어있게 해야지.
 // img alt 가 안 먹길래 해 둔 <obejct><p></p></object> 를 img.onError 로 바꿔야겠다. 나중에 해야지.
