@@ -1,0 +1,89 @@
+#wrap, #wrap_ol, #bg, body {
+	padding      : 0;
+	margin       : 0;
+}
+
+header {
+	/*이전 header 스타일*/
+	font-size    : 2em;
+	position     : absolute;
+	top          : 0%;
+	left         : 80%;
+	margin-top   : 0.5em;
+	margin-left  : 0.5em;
+}
+
+footer {
+	font-size    : 1em;
+	position     : absolute;
+	top          : 100%;
+	margin-top   : -2em;
+	z-index      :-1;
+}
+
+#None {
+	font-size    : 2em;
+	overflow     : hidden;
+}
+
+#bg {
+	position     : absolute;
+	width        : 100%;
+	height       : 100%;
+	z-index      :-1;
+	opacity      :0.1;
+}
+
+.Node {
+	/*referenced : http://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/*/
+
+	/*for circle shape*/
+	width        : 100px;
+	height       : 100px;
+	border-radius: 100px;
+
+	/*for positioning center*/
+	/*!!!!!!!!! 화면 크기가 작아서 안 보이는데도 스크롤이 안 됨 ㅜㅜ*/
+	position     :  fixed;
+	top          : 50%;
+	left         : 50%;
+	margin-left  : -100px;
+	margin-top   : -100px;
+	
+	/*for text align*/
+	padding      : 50px;
+	line-height  : 1.8em;
+	text-align   : center;
+	word-break   : break-all;
+	overflow     : hidden;                                                          
+
+	-webkit-transform: matrix(1,0,0,1,0,0);
+	   -moz-transform: matrix(1,0,0,1,0,0);
+	    -ms-transform: matrix(1,0,0,1,0,0);
+	     -o-transform: matrix(1,0,0,1,0,0);
+	        transform: matrix(1,0,0,1,0,0);
+
+	box-shadow   : 3px 3px 2px rgba(196, 196, 196, 1.0);
+}
+
+.Child {
+	-webkit-transform: scale(0.5, 0.5);
+	   -moz-transform: scale(0.5, 0.5);
+	    -ms-transform: scale(0.5, 0.5);
+	     -o-transform: scale(0.5, 0.5);
+	        transform: scale(0.5, 0.5);
+
+	/*글자는 크기 줄이면 안 됨.*/
+	font-size: 150%;
+}
+
+.Parent {
+	-webkit-transform: scale(0.5, 0.5);
+	   -moz-transform: scale(0.5, 0.5);
+	    -ms-transform: scale(0.5, 0.5);
+	     -o-transform: scale(0.5, 0.5);
+	        transform: scale(0.5, 0.5);
+
+	/*글자는 크기 줄이면 안 됨.*/
+	font-size: 150%;
+}
