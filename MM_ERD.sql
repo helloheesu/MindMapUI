@@ -84,12 +84,45 @@ CREATE TABLE IF NOT EXISTS `log_node` (
     FOREIGN KEY (`node_id`)
     REFERENCES `node` (`id`));
 
-
+SHOW TABLES;
+SELECT * FROM node;
+SELECT * FROM user;
+SELECT * FROM log_node;
+SELECT * FROM log_activity;
+SELECT * FROM genealogy;
 
 
 
 -- -----------------------------------------------------
--- Regist (회원가입)
+-- Create (노드 생성)
+-- -----------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_create_new_node_id;
+DELIMITER $$
+CREATE PROCEDURE sp_create_new_node_id(
+  IN input_content VARCHAR(200), IN input_authority VARCHAR(45), IN input_time TIMESTAMP, OUT result_node_id INT)
+BEGIN
+  DECLARE selected_node INT;
+  
+  START TRANSACTION;
+    INSERT INTO node VALUES (NULL);     # HEAD NODE 로 빈 노드 생성
+    SET selected_node = LAST_INSERT_ID(); # INSERT 된 ID 값을 받아서 저장한다
+    
+    INSERT INTO log_node (node_id, time, authority, content) VALUES (selected_node, NOW(), input_authority, input_content);
+    SET result_node_id = selected_node;
+
+    COMMIT;
+  
+END $$
+DELIMITER ;
+
+SET @new_head = NULL;
+CALL sp_create_new_node_id('안녕heLlow', 'ONLYME', NOW(), @new_head);
+SELECT @new_head;
+SELECT * FROM log_node WHERE node_id=@new_head;
+SELECT * FROM log_node;
+
+-- -----------------------------------------------------
+-- Register (회원가입)
 -- -----------------------------------------------------
 DROP PROCEDURE IF EXISTS sp_register;
 DELIMITER $$
@@ -100,21 +133,14 @@ BEGIN
   DECLARE selected_node INT;
   DECLARE selected_user INT;
 
-  START TRANSACTION;
-    #존재하는 이메일이면 롤백.
-    
+  START TRANSACTION;    
     SET email_exists = NULL;
     SELECT id INTO email_exists FROM user WHERE email=input_email;
 
     IF email_exists IS NULL THEN
-      # HEAD NODE 로 빈 노드 생성
-      INSERT INTO node VALUES (NULL);
-      # INSERT 된 ID 값을 받아서 저장한다
-      SET selected_node = LAST_INSERT_ID();
-      
-      INSERT INTO log_node (node_id, time, authority, content) VALUES (selected_node, NOW(), 'ALL', input_name);
-    
-      INSERT INTO user (head_id, email, password, name) VALUES (selected_node, input_email, MD5(input_passwd), input_name);
+      SET @created_haed_id = NULL;
+      CALL sp_create_new_node_id(input_name, 'ALL', NOW(), @created_head_id);
+      INSERT INTO user (head_id, email, password, name) VALUES (@created_head_id, input_email, MD5(input_passwd), input_name);
       SET selected_user = LAST_INSERT_ID();
       
       INSERT INTO log_activity (user_id, time, activity) VALUES (selected_user, NOW(), 'REGISTER');
@@ -126,14 +152,14 @@ BEGIN
     ELSE
       SET result = "ALREADY EXSISTING ID";
       COMMIT; # COMMIT? ROLLBACK? 롤백하면 result 가 제대로 반환될까?
-
+          # 지금보니 TRANSACTION 의 필요성 자체에 회의. 모듈적이니까 다 해야하는 거 같기도 하고.. --> 그래서 일단 create 부터 뺌.
     END IF;
 
 END $$
 DELIMITER ;
 
 SET @output_result = NULL;
-CALL sp_register('hㅑ@nhn.2rg', 'heowlrowl', '김가안녕', @output_result);
+CALL sp_register('hoho@naver.org', 'passtestword', '새로운이름', @output_result);
 SELECT * FROM user;
 SELECT * FROM log_activity;
 SELECT * FROM node;
@@ -186,7 +212,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-
+SELECT * FROM user;
 SET @output_result = NULL;
 CALL sp_login('123@nhn.2rg', 'heowlrowl', @output_result);
 SELECT @output_result;
@@ -202,6 +228,7 @@ SELECT @output_result;
 -- -----------------------------------------------------
 # 회원탈퇴에서는 유효한 회원인지(존재하는 id, 비 탈퇴회원) 체크 안 해도 될 거 같은데...
 # 이미 로그인 할 때 체크했고 그걸 세션에 남길테니까....
+# --> 그래서 crate 부터는 알 수 있다는 가정하에, in param 으로 head id 바로 넘김.
 
 DROP PROCEDURE IF EXISTS sp_leave;
 DELIMITER $$
@@ -252,6 +279,3 @@ SELECT * FROM log_activity;
 SELECT * FROM log_node;
 
 
--- -----------------------------------------------------
--- 
--- -----------------------------------------------------
