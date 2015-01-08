@@ -40,7 +40,7 @@ BackgroundList = [
 Contents = {'NodeCnt':0};
 
 Contents['Empty'] = {'Exclude':true, 'Content':''};
-Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <object data="res/onDogFoot.png" type="image/png" style="margin-top:-20px;margin-left:-20px;"> <span style="font-size:2em;">졸려</span> </object> </object>'};
+Contents['None'] = {'Exclude':true, 'Content':'<object data="http://postfiles14.naver.net/20131101_45/pztclagk_1383280808251QSDVL_PNG/10.png?type=w1" type="image/png"> <object data="images/onDogFoot.png" type="image/png" style="margin-top:-20px;margin-left:-20px;"> <span style="font-size:2em;">졸려</span> </object> </object>'};
 Contents['Add'] = {'Exclude':true, 'Content':'<span style="font-size:5em; color:gray;">+</span>'};
 Contents['Adding'] = {'Exclude':true, 'Content':'<Input id="AddInput" type="text" value=""><br><Input id="AddButton" type="button" value="Add"><br><Input id="BackButton" type="button" value="Back">'};
 Contents['Node0'] = {'Exclude':true, 'Content':'Heesu', 'Depth':0, 'Parent':null, 'Child':[]};
